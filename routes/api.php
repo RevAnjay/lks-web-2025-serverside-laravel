@@ -12,8 +12,10 @@ Route::get('/user', function (Request $request) {
 
 Route::prefix('v1/auth')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
-    Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
-    Route::get('user', [AuthController::class, 'user'])->middleware('auth:sanctum');
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('logout', [AuthController::class, 'logout']);
+        Route::get('user', [AuthController::class, 'user']);
+    });
 });
 
 Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
