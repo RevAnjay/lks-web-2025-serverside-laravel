@@ -9,6 +9,7 @@ class InstallmentApplySocieties extends Model
     protected $table = 'installment_apply_societies';
 
     protected $fillable = [
+        'society_id',
         'installment_id',
         'available_month_id',
         'notes',

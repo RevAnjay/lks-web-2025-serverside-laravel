@@ -10,6 +10,7 @@ use App\Models\InstallmentApplySocieties;
 use App\Models\InstallmentCars;
 use App\Models\Validation;
 use Auth;
+use Carbon\Carbon;
 use Carbon\Traits\Timestamp;
 use Illuminate\Http\Request;
 use DB;
@@ -91,26 +92,30 @@ class ApiController extends Controller
             }
 
             $car = InstallmentCars::find($request->installment_id);
-            $term = AvailableMonth::where('car_id', $car->id)->where('months', $request->months)->first();
+            $term = AvailableMonth::where('id', $request->months)->first();
             if (!$term) {
                 return response()->json(['message' => 'Invalid months for this car'], 422);
             }
 
             // hitung monthly
-            $rate = $term->interest_rate ?? 0;
-            $monthly = (int) ceil(($car->price * (1 + $rate)) / $term->months);
+            $monthly = (int) ceil($car->price / $term->month);
 
             // B5b: income check
             if (($val->income ?? 0) < $monthly) {
-                return response()->json(['message' => 'Income is less than required monthly payment'], 422);
+                return response()->json([
+                    'message' => 'Your income is insufficient for this installment',
+                    'required_monthly' => $monthly,
+                    'your_income' => $val->income
+                ], 422);
             }
 
 
             InstallmentApplySocieties::create([
                 'society_id' => $user->id,
                 'installment_id' => $car->id,
-                'avaliable_month_id' => $term->months,
-                'notes' => $request->notes
+                'avaliable_month_id' => $request->months,
+                'notes' => $request->notes,
+                'date' => Carbon::now()
             ]);
 
             DB::commit();
