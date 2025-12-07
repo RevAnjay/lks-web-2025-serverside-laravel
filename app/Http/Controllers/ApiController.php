@@ -134,6 +134,6 @@ class ApiController extends Controller
 
         $user = Auth::user();
 
-        return response()->json(ApplicationResource::collection(InstallmentApplySocieties::where('society_id', $user->id)->get()));
+        return response()->json(ApplicationResource::collection(InstallmentApplySocieties::with('availableMonth')->where('society_id', $user->id)->get()));
     }
 }

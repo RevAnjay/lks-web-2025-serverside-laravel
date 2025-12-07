@@ -19,7 +19,7 @@ class ApplicationResource extends JsonResource
             'name' => $this->car->cars,
             'description' => $this->car->description,
             'price' => $this->car->price,
-            'months' => $this->availableMonth->month,
+            'months' => $this->availableMonth->month ?? null,
             'status' => $this->status->status ?? null,
             'notes' => $this->notes,
             'apply_date' => $this->created_at,
