@@ -7,23 +7,25 @@ use Auth;
 use DB;
 use Illuminate\Http\Request;
 use Validator;
+use App\Http\Requests\LoginRequest;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
+        $validated = $request->validated();
         try {
-            $validator = Validator::make($request->all(), [
-                'id_card_number' => 'required|exists:societies,id_card_number',
-                'password' => 'required'
-            ]);
+            // $validator = Validator::make($request->all(), [
+            //     'id_card_number' => 'required|exists:societies,id_card_number',
+            //     'password' => 'required'
+            // ]);
 
-            if ($validator->fails())
-                return response()->json(["message" => "ID Card Number or Password incorrect"], 401);
+            // if ($validator->fails())
+            //     return response()->json(["message" => "ID Card Number or Password incorrect"], 401);
 
-            $data = Society::where('id_card_number', $request->id_card_number)->with('Regional')->first();
+            $data = Society::where('id_card_number', $validated['id_card_number'])->with('Regional')->first();
 
-            if (!$data || $data->password != $request->password)
+            if (!$data || $data->password != $validated['password'])
                 return response()->json(["message" => "ID Card Number or Password incorrect"], 401);
 
             return response()->json([
